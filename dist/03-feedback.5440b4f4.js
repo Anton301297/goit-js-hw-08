@@ -507,32 +507,37 @@ var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 var _lodashThrottle = require("lodash.throttle");
 var _lodashThrottleDefault = parcelHelpers.interopDefault(_lodashThrottle);
 const refs = {
-    form: document.querySelector(".feedback-form"),
     email: document.querySelector(".feedback-form input"),
     textarea: document.querySelector(".feedback-form textarea")
 };
-// console.log(form);
-refs.form.addEventListener("input", (0, _lodashThrottleDefault.default)(onFormInput, 500));
-refs.form.addEventListener("submit", onFormSubmit);
-onSiteReload();
+const form = document.querySelector(".feedback-form");
+form.addEventListener("input", (0, _lodashThrottleDefault.default)(onFormInput, 500));
+form.addEventListener("submit", onFormSubmit);
 const formData = {};
 function onFormInput(evt) {
     formData[evt.target.name] = evt.target.value;
     localStorage.setItem("feedback-form-state", JSON.stringify(formData));
-    console.log(formData);
+}
+function fromStorageToForm(keys, dataLocalStorage) {
+    for (const key of keys){
+        formData[key] = dataLocalStorage[key];
+        refs[key].value = dataLocalStorage[key];
+    }
 }
 function onFormSubmit(evt) {
     evt.preventDefault();
+    if (formData.email === undefined || formData.message === undefined) return alert("\u041D\u0430\u043F\u0438\u0448\u0438 \u0449\u043E\u0441\u044C \u0432 \u043A\u043E\u0436\u043D\u043E\u043C\u0443 \u043F\u043E\u043B\u0456");
+    else if (formData.email === " " || formData.message === " ") return alert("\u041D\u0430\u043F\u0438\u0448\u0438 \u0449\u043E\u0441\u044C \u0432 \u043A\u043E\u0436\u043D\u043E\u043C\u0443 \u043F\u043E\u043B\u0456");
     evt.target.reset();
     localStorage.removeItem("feedback-form-state");
+    console.log(formData);
+    delete formData.email;
+    delete formData.message;
 }
-function onSiteReload() {
-    const savedMessage = JSON.parse(localStorage.getItem("feedback-form-state"));
-    if (savedMessage) {
-        refs.form.value = savedMessage;
-        refs.email.value = savedMessage.email;
-        refs.textarea.value = savedMessage.message;
-    }
+if (localStorage.getItem("feedback-form-state")) {
+    const parsedLocalStorage = JSON.parse(localStorage.getItem("feedback-form-state"));
+    const keys = Object.keys(parsedLocalStorage);
+    fromStorageToForm(keys, parsedLocalStorage);
 }
 
 },{"lodash.throttle":"bGJVT","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"bGJVT":[function(require,module,exports) {
